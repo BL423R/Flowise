@@ -1,0 +1,33 @@
+name: Run Flowise
+
+on:
+  workflow_dispatch:
+
+jobs:
+  run-flowise:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repo
+      uses: actions/checkout@v2
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
+    - name: Install Flowise
+      run: |
+        npm install -g flowise
+
+    - name: Start Flowise with Ngrok
+      run: |
+        npm install -g ngrok
+        ngrok authtoken ${{ secrets.NGROK_AUTH_TOKEN }}
+        nohup npx flowise start &
+        sleep 5
+        nohup ngrok http 3000 &
+
+    - name: Keep Alive
+      run: sleep 10800  # 3 hours
+      
